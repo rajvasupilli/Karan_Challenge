@@ -1,15 +1,16 @@
 ---
-- name: Create Launch Template
-  ec2_lc:
-    name: "{{ launch_template_name }}"
-    image_id: "{{ image_id }}"
+- name: Create EC2 Key Pair
+  ec2_key:
+    name: "{{ keypair_name }}"
     region: "{{ region }}"
-    instance_type: "{{ instance_type }}"
-    key_name: "{{ key_name }}"
-    vpc_id: "{{ vpc_id }}"
-    security_groups: "{{ security_group_name }}"
-    user_data: "#!/bin/bash\nsudo apt update\nsudo apt install python3-pip\nsudo pip3 install boto3\nsudo apt install -y nginx\necho '{{ nginx_custom_page }}' > /usr/share/nginx/html/index.html"
-  register: launch_template_result
+  register: ec2_keypair
+
+- name: Save the private key
+  copy:
+    content: "{{ ec2_keypair.key.private_key }}"
+    dest: "{{ keypair_file }}"
+    mode: 0400
+  when: ec2_keypair.changed
 
 - name: Create the security group
   ec2_group:
@@ -22,28 +23,25 @@
         to_port: 443
         cidr_ip: 0.0.0.0/0
 
+- name: Create Launch Configuration
+  ec2_lc:
+    name: "{{ lc_name }}"
+    image_id: "{{ image_id }}"
+    key_name: "{{ keypair_name }}"
+    instance_type: "{{ instance_type }}"
+    region: "{{ region }}"
+    user_data: "#!/bin/bash\nsudo yum update\nsudo yum install -y nginx\necho '{{ nginx_custom_page }}' > /usr/share/nginx/html/index.html"
+  register: launch_config
+
 - name: Create the auto scaling group
   ec2_asg:
-    name: "{{ asg_name }}"
-    launch_config_name: "{{ asg_name }}-launch-config"
+    name: "{{ auto_scaling_group_name }}"
+    launch_config_name: "{{ lc_name }}"
     region: "{{ region }}"
-    instance_type: "{{ instance_type }}"
-    image_id: "{{ ami_id }}"
-    key_name: "{{ key_name }}"
-    security_groups: ["{{ security_group_name }}"]
     desired_capacity: "{{ desired_capacity }}"
     min_size: "{{ min_size }}"
     max_size: "{{ max_size }}"
-
-- name: Wait for instances to become available
-  local_action:
-    module: wait_for
-    host: "{{ item.id }}"
-    port: 22
-    delay: 10
-    timeout: 320
-    state: started
-  with_items: "{{ ec2_asg.instances }}"
+    availability_zones: "{{ availability_zones }}"
 
 - name: Set up HTTPS with a default certificate
   become: true
