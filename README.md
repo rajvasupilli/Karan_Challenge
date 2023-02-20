@@ -15,3 +15,5 @@ Note: If you run into the error "botocore.exceptions.NoCredentialsError: Unable 
       [Credentials]
       aws_access_key_id = AKIARD3FB6N4UCXI67NM
       aws_secret_access_key = 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
+
+An Ubuntu VM was used to test the Ansible role
