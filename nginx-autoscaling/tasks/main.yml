@@ -16,7 +16,7 @@
       - proto: tcp
         from_port: 22
         to_port: 22
-        cidr_ip: 0.0.0.0/0
+        cidr_ip: 49.206.39.94/32
 
 - name: Create Launch Configuration
   ec2_lc:
@@ -35,8 +35,8 @@
       sudo chmod -R 755 /etc/nginx/certs
       openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/certs/server.key -out /etc/nginx/certs/server.crt -subj "/C=US/ST=California/L=San Francisco/O=My Company/OU=IT Department/CN=*.compute-1.amazonaws.com"
       sed -i "s|listen\s*80|listen 443 ssl|g" /etc/nginx/sites-available/default
-      sed -i '/listen 443 ssl/a ssl_certificate_key /etc/nginx/certs/server.key;'/etc/nginx/sites-available/default
-      sed -i '/listen 443 ssl/a ssl_certificate /etc/nginx/certs/server.crt; '/etc/nginx/sites-available/default
+      sed -i "s/listen 443 ssl/a ssl_certificate_key /etc/nginx/certs/server.key;" /etc/nginx/sites-available/default
+      sed -i "s/listen 443 ssl/a ssl_certificate /etc/nginx/certs/server.crt;" /etc/nginx/sites-available/default
       sudo service nginx reload
       sudo service nginx reload
   register: launch_config
