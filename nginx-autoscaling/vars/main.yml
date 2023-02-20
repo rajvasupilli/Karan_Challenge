@@ -12,7 +12,7 @@ max_size: 3
 desired_capacity: 1
 lc_name: sed-launch-config
 auto_scaling_group_name: sed-auto-scaling-group
-nginx_custom_page: "<html><body><h1>Welcome to my custom NGINX page!</h1></body></html>"
+nginx_custom_page: "<html><head><title>Hello World</title></head><body><h1>Hello World!</h1></body></html>"
 availability_zones:
   - us-east-1a
   - us-east-1b
