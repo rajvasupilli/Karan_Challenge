@@ -1,4 +1,10 @@
 ---
+- name: Create EC2 Key Pair
+  ec2_key:
+    name: "{{ keypair_name }}"
+    region: "{{ region }}"
+  register: ec2_keypair
+  
 - name: Create the security group
   ec2_group:
     name: "{{ security_group_name }}"
