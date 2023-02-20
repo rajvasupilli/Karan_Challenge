@@ -6,7 +6,7 @@ security_group_name: sed-security-group
 keypair_name: ubbu
 keypair_file: "{{ playbook_dir }}/files/my-keypair.pem"
 instance_type: t2.medium
-image_id: ami-0c94855ba95c71c99
+image_id: ami-09cd747c78a9add63
 min_size: 1
 max_size: 3
 desired_capacity: 1
