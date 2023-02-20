@@ -7,6 +7,7 @@
 3. Install Boto3
    ``` sudo pip3 install boto3 ```
 4. Install AWS CLI verison 2 and configure the aws credentials
+5. Update the vpc id in the vars/main.yml, before you kickstart the role installation
 
 ### The folder named nginx-autoscaling contains the Ansible Role configuration which will provision the below resources in AWS:
 
