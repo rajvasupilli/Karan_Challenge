@@ -3,7 +3,7 @@
 region: us-east-1
 vpc_id: vpc-05a9ba5a79c8d81f1
 security_group_name: sed-security-group
-keypair_name: sed-key-pair
+keypair_name: ubbu
 keypair_file: "{{ playbook_dir }}/files/my-keypair.pem"
 instance_type: t2.medium
 image_id: ami-0c94855ba95c71c99
