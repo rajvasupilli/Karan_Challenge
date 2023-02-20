@@ -37,6 +37,7 @@
       sed -i "s|listen\s*80|listen 443 ssl|g" /etc/nginx/sites-available/default
       sed -i "/listen 443 ssl/a ssl_certificate_key \/etc\/nginx\/certs\/server.key;" /etc/nginx/sites-available/default
       sed -i "/listen 443 ssl/a ssl_certificate \/etc\/nginx\/certs\/server.crt;" /etc/nginx/sites-available/default
+      sed -i "s#root /var/www/html;#root /usr/share/nginx/html;#g" /etc/nginx/sites-available/default
       sudo service nginx reload
       sudo service nginx reload
   register: launch_config
