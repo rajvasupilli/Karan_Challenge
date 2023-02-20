@@ -1,4 +1,17 @@
 ---
+- name: Create EC2 Key Pair
+  ec2_key:
+    name: "{{ keypair_name }}"
+    region: "{{ region }}"
+  register: ec2_keypair
+
+- name: Save the private key
+  copy:
+    content: "{{ ec2_keypair.key.private_key }}"
+    dest: "{{ keypair_file }}"
+    mode: 0400
+  when: ec2_keypair.changed
+
 - name: Create the security group
   ec2_group:
     name: "{{ security_group_name }}"
@@ -16,7 +29,7 @@
       - proto: tcp
         from_port: 22
         to_port: 22
-        cidr_ip: 49.206.39.94/32
+        cidr_ip: 0.0.0.0/0
 
 - name: Create Launch Configuration
   ec2_lc:
@@ -31,14 +44,6 @@
       apt-get update -y
       apt-get install nginx -y
       echo '{{ nginx_custom_page }}' > /usr/share/nginx/html/index.html
-      sudo mkdir /etc/nginx/certs
-      sudo chmod -R 755 /etc/nginx/certs
-      openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/certs/server.key -out /etc/nginx/certs/server.crt -subj "/C=US/ST=California/L=San Francisco/O=My Company/OU=IT Department/CN=*.compute-1.amazonaws.com"
-      sed -i "s|listen\s*80|listen 443 ssl|g" /etc/nginx/sites-available/default
-      sed -i "/listen 443 ssl/a ssl_certificate_key \/etc\/nginx\/certs\/server.key;" /etc/nginx/sites-available/default
-      sed -i "/listen 443 ssl/a ssl_certificate \/etc\/nginx\/certs\/server.crt;" /etc/nginx/sites-available/default
-      sudo service nginx reload
-      sudo service nginx reload
   register: launch_config
 
 - name: Create the auto scaling group
@@ -56,3 +61,27 @@
     wait_for_instances: yes
     health_check_type: EC2
   register: ec2
+
+- name: Set up HTTPS with a default certificate
+  become: true
+  lineinfile:
+    path: /etc/nginx/conf.d/default.conf
+    line: |
+      server {
+        listen 443 ssl;
+        server_name example.com;
+        ssl_certificate /etc/pki/tls/certs/localhost.crt;
+        ssl_certificate_key /etc/pki/tls/private/localhost.key;
+        location / {
+          root /usr/share/nginx/html;
+          index index.html;
+        }
+      }
+  notify: Reload_Nginx
+
+- name: Reload_Nginx
+  become: true
+  service:
+    name: nginx
+    state: restarted
+
