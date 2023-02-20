@@ -1,0 +1,9 @@
+---
+- name: Install Ansible Role
+  hosts: localhost
+  become: true
+
+  tasks:
+  - name: Include Ansible Role
+    include_role:
+      name: nginx-autoscaling

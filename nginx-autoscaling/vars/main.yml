@@ -1,0 +1,14 @@
+---
+# Role Variables
+region: us-east-1
+vpc_id: vpc-0ce9646c00ac3f460
+security_group_name: sed-security-group
+key_name: sed-key-pair
+instance_type: t2.micro
+image_id: ami-09cd747c78a9add63
+min_size: 1
+max_size: 3
+desired_capacity: 2
+launch_template_name: sed-launch-template
+auto_scaling_group_name: sed-auto-scaling-group
+nginx_custom_page: "<html><body><h1>Welcome to my custom NGINX page!</h1></body></html>"
